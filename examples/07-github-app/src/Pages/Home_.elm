@@ -1,15 +1,22 @@
 module Pages.Home_ exposing (Model, Msg, page)
 
-import Api.GitHub.User
+import Api.GitHub.Search.User
 import Effect exposing (Effect)
 import Html exposing (..)
 import Html.Attributes exposing (alt, attribute, class, placeholder, src, type_, value)
 import Html.Events
 import Http
+import Layout exposing (Layout)
 import Page exposing (Page)
 import Route exposing (Route)
+import Route.Path
 import Shared
 import View exposing (View)
+
+
+layout : Layout
+layout =
+    Layout.Navbar
 
 
 page : Shared.Model -> Route () -> Page Model Msg
@@ -28,7 +35,7 @@ page shared route =
 
 type alias Model =
     { searchInput : String
-    , users : Result Http.Error (List Api.GitHub.User.User)
+    , users : Result Http.Error (List Api.GitHub.Search.User.User)
     }
 
 
@@ -48,7 +55,7 @@ init () =
 type Msg
     = UserChangedSearchInput String
     | UserSubmittedSearchForm
-    | GitHubSearchApiResponded (Result Http.Error (List Api.GitHub.User.User))
+    | GitHubSearchApiResponded (Result Http.Error (List Api.GitHub.Search.User.User))
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
@@ -62,7 +69,7 @@ update msg model =
         UserSubmittedSearchForm ->
             ( model
             , Effect.fromCmd
-                (Api.GitHub.User.search
+                (Api.GitHub.Search.User.search
                     { query = model.searchInput
                     , onResponse = GitHubSearchApiResponded
                     }
@@ -93,8 +100,10 @@ view model =
     { title = "GitHub Explorer"
     , body =
         [ viewHero
-        , viewSearchForm model
-        , viewListOfUsers model
+        , main_ [ class "container p-6" ]
+            [ viewSearchForm model
+            , viewListOfUsers model
+            ]
         ]
     }
 
@@ -102,17 +111,17 @@ view model =
 viewHero : Html msg
 viewHero =
     section [ class "hero is-link" ]
-        [ div [ class "hero-body" ]
-            [ h1 [ class "title" ] [ text "GitHub Explorer" ]
-            , h2 [ class "subtitle" ] [ text "Browse those repos!" ]
+        [ div [ class "hero-body container has-text-centered" ]
+            [ h1 [ class "title is-1" ] [ text "GitHub Explorer" ]
+            , h2 [ class "subtitle is-4" ] [ text "Browse those repos!" ]
             ]
         ]
 
 
 viewSearchForm : Model -> Html Msg
 viewSearchForm model =
-    form [ class "is-flex p-6", Html.Events.onSubmit UserSubmittedSearchForm ]
-        [ div [ class "field  has-addons" ]
+    form [ class "is-flex is-justify-content-center", Html.Events.onSubmit UserSubmittedSearchForm ]
+        [ div [ class "field has-addons" ]
             [ div [ class "control" ]
                 [ input
                     [ class "input"
@@ -136,20 +145,22 @@ viewSearchForm model =
 
 viewListOfUsers : Model -> Html Msg
 viewListOfUsers model =
-    div [ class "px-6" ]
+    div [ class "px-6 pt-6" ]
         [ case model.users of
             Err httpError ->
                 p [ class "has-text-danger" ] [ text "Something went wrong..." ]
 
             Ok users ->
-                div []
-                    (List.map viewUser users)
+                div [] (List.map viewUser users)
         ]
 
 
-viewUser : Api.GitHub.User.User -> Html Msg
+viewUser : Api.GitHub.Search.User.User -> Html Msg
 viewUser user =
-    div [ class "box" ]
+    a
+        [ Route.Path.href (Route.Path.Username_ { username = user.login })
+        , class "box"
+        ]
         [ div [ class "media" ]
             [ div [ class "media-left" ]
                 [ figure [ class "image is-64x64" ]

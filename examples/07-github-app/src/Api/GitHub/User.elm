@@ -1,4 +1,4 @@
-module Api.GitHub.User exposing (User, search)
+module Api.GitHub.User exposing (User, get)
 
 import Http
 import Json.Decode
@@ -9,17 +9,19 @@ type alias User =
     { id : Int
     , login : String
     , avatarUrl : String
+    , name : String
+    , bio : Maybe String
     }
 
 
-search :
-    { query : String
-    , onResponse : Result Http.Error (List User) -> msg
+get :
+    { username : String
+    , onResponse : Result Http.Error User -> msg
     }
     -> Cmd msg
-search options =
+get options =
     Http.get
-        { url = "https://api.github.com/search/users?q=" ++ Url.percentEncode options.query
+        { url = "http://localhost:5000/users/" ++ options.username
         , expect = Http.expectJson options.onResponse decoder
         }
 
@@ -28,14 +30,11 @@ search options =
 -- JSON
 
 
-decoder : Json.Decode.Decoder (List User)
+decoder : Json.Decode.Decoder User
 decoder =
-    Json.Decode.field "items" (Json.Decode.list userDecoder)
-
-
-userDecoder : Json.Decode.Decoder User
-userDecoder =
-    Json.Decode.map3 User
+    Json.Decode.map5 User
         (Json.Decode.field "id" Json.Decode.int)
         (Json.Decode.field "login" Json.Decode.string)
         (Json.Decode.field "avatar_url" Json.Decode.string)
+        (Json.Decode.field "name" Json.Decode.string)
+        (Json.Decode.field "bio" (Json.Decode.maybe Json.Decode.string))
