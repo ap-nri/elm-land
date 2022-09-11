@@ -19,7 +19,7 @@ search :
     -> Cmd msg
 search options =
     Http.get
-        { url = "http://localhost:5000/search/users?q=" ++ Url.percentEncode options.query
+        { url = "https://api.github.com/search/users?q=" ++ Url.percentEncode options.query
         , expect = Http.expectJson options.onResponse decoder
         }
 

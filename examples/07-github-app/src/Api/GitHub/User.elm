@@ -21,7 +21,7 @@ get :
     -> Cmd msg
 get options =
     Http.get
-        { url = "http://localhost:5000/users/" ++ options.username
+        { url = "https://api.github.com/users/" ++ options.username
         , expect = Http.expectJson options.onResponse decoder
         }
 

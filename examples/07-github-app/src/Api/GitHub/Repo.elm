@@ -30,7 +30,7 @@ get :
 get options =
     Http.get
         { url =
-            "http://localhost:5000/repos/{{username}}/{{repoName}}"
+            "https://api.github.com/repos/{{username}}/{{repoName}}"
                 |> String.replace "{{username}}" options.username
                 |> String.replace "{{repoName}}" options.repoName
         , expect = Http.expectJson options.onResponse decoder

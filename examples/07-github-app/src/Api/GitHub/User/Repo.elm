@@ -23,7 +23,7 @@ latest :
 latest options =
     Http.get
         { url =
-            "http://localhost:5000/users/{{username}}/repos?sort=created&per_page=15"
+            "https://api.github.com/users/{{username}}/repos?sort=created&per_page=15"
                 |> String.replace "{{username}}" options.username
         , expect = Http.expectJson options.onResponse decoder
         }
