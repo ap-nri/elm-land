@@ -151,7 +151,7 @@ When we need a page to handle URLs like `/profile/ryan`, `/profile/duncan`, or `
 A __dynamic route__ passes in URL parameters (like `username`) to your page as an input, so it can handle the dynamic values.
 
 ```sh
-elm-land add page:static /profile/:username
+elm-land add page:dynamic /profile/:username
 ```
 
 ![Browser window showing the profile page](./pages/profile-ryan.png)
